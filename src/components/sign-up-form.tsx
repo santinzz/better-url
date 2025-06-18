@@ -4,7 +4,7 @@ import { User, Mail, EyeOff, Eye, Lock } from 'lucide-react'
 import { Input } from './ui/input'
 import { useState, useTransition } from 'react'
 import { Button } from './ui/button'
-import { Form, FormControl, FormField, FormItem } from './ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod/v4'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -47,7 +47,7 @@ export const SignUpForm = () => {
 
 	const handleSignUp = (data: TSignUpSchema) => {
 		startTransition(async () => {
-			authClient.signUp.email(
+			await authClient.signUp.email(
 				{
 					email: data.email,
 					password: data.password,
@@ -93,6 +93,7 @@ export const SignUpForm = () => {
 									/>
 								</FormControl>
 							</div>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -118,6 +119,7 @@ export const SignUpForm = () => {
 									/>
 								</FormControl>
 							</div>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -155,6 +157,7 @@ export const SignUpForm = () => {
 									)}
 								</button>
 							</div>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -227,6 +230,7 @@ export const SignUpForm = () => {
 				<Button
 					type='submit'
 					className='w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium'
+					disabled={isLoading}
 				>
 					{isLoading ? (
 						<div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
