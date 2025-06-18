@@ -1,4 +1,6 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, uniqueIndex, index } from 'drizzle-orm/sqlite-core'
+import { createSelectSchema } from 'drizzle-zod'
+import { z } from 'zod/v4'
 
 export const user = sqliteTable('user', {
 	id: text('id').primaryKey(),
@@ -15,6 +17,9 @@ export const user = sqliteTable('user', {
 		.$defaultFn(() => /* @__PURE__ */ new Date())
 		.notNull(),
 })
+
+export const userSelectSchema = createSelectSchema(user)
+export type User = z.infer<typeof userSelectSchema>
 
 export const session = sqliteTable('session', {
 	id: text('id').primaryKey(),
@@ -63,3 +68,20 @@ export const verification = sqliteTable('verification', {
 		() => /* @__PURE__ */ new Date()
 	),
 })
+
+export const link = sqliteTable('link', {
+	id: text('id').primaryKey().$defaultFn(crypto.randomUUID),
+	url: text('url').notNull(),
+	shortUrl: text('short_url').notNull(),
+	clickCount: integer('click_count').notNull(),
+	isActive: integer('is_active', { mode: 'boolean' }).notNull(),
+	createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => /* @__PURE__ */ new Date()),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => /* @__PURE__ */ new Date()),
+	userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+}, (table) => [
+	uniqueIndex('short_url_idx').on(table.shortUrl),
+	index('user_id_idx').on(table.userId),
+])
+
+export const linkSelectSchema = createSelectSchema(link)
+export type Link = z.infer<typeof linkSelectSchema>

@@ -1,6 +1,3 @@
-"use client"
-
-import { useState } from "react"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,10 +29,12 @@ import {
   MousePointer,
 } from "lucide-react"
 import { toast } from "sonner"
+import { DataTable } from "@/components/data-table"
+import { getLinks } from "@/actions/getLinks"
+import { columns } from "./columns"
 
-export default function DashboardPage() {
-  const [newUrl, setNewUrl] = useState("")
-  const [isShortening, setIsShortening] = useState(false)
+export default async function DashboardPage() {
+  const links = await getLinks()
 
   const stats = [
     {
@@ -67,70 +66,6 @@ export default function DashboardPage() {
       icon: Eye,
     },
   ]
-
-  const recentLinks = [
-    {
-      id: 1,
-      original: "https://example.com/very-long-url-that-needs-shortening",
-      short: "bttr.ly/abc123",
-      clicks: 1247,
-      created: "2 hours ago",
-      status: "active",
-    },
-    {
-      id: 2,
-      original: "https://github.com/user/repository-name",
-      short: "bttr.ly/def456",
-      clicks: 892,
-      created: "1 day ago",
-      status: "active",
-    },
-    {
-      id: 3,
-      original: "https://docs.example.com/documentation/guide",
-      short: "bttr.ly/ghi789",
-      clicks: 456,
-      created: "3 days ago",
-      status: "active",
-    },
-    {
-      id: 4,
-      original: "https://blog.example.com/article-title",
-      short: "bttr.ly/jkl012",
-      clicks: 234,
-      created: "1 week ago",
-      status: "paused",
-    },
-    {
-      id: 5,
-      original: "https://shop.example.com/product/item",
-      short: "bttr.ly/mno345",
-      clicks: 1089,
-      created: "2 weeks ago",
-      status: "active",
-    },
-  ]
-
-  const handleShortenUrl = async () => {
-    if (!newUrl) return
-
-    setIsShortening(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsShortening(false)
-      setNewUrl("")
-      toast("URL Shortened!", {
-        description: "Your new short URL has been created successfully.",
-      })
-    }, 1000)
-  }
-
-  const handleCopyUrl = (url: string) => {
-    navigator.clipboard.writeText(`https://${url}`)
-    toast("Copied!", {
-      description: "Short URL copied to clipboard",
-    })
-  }
 
   return (
     <SidebarProvider>
@@ -174,24 +109,16 @@ export default function DashboardPage() {
               <div className="flex gap-2">
                 <Input
                   placeholder="https://example.com/your-long-url"
-                  value={newUrl}
-                  onChange={(e) => setNewUrl(e.target.value)}
                   className="flex-1"
-                  onKeyPress={(e) => e.key === "Enter" && handleShortenUrl()}
                 />
                 <Button
-                  onClick={handleShortenUrl}
-                  disabled={!newUrl || isShortening}
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
-                  {isShortening ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
                     <>
                       <Zap className="w-4 h-4 mr-2" />
                       Shorten
                     </>
-                  )}
                 </Button>
               </div>
             </CardContent>
@@ -235,85 +162,7 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Original URL</TableHead>
-                    <TableHead>Short URL</TableHead>
-                    <TableHead>Clicks</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="w-[70px]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentLinks.map((link) => (
-                    <TableRow key={link.id}>
-                      <TableCell className="max-w-[300px]">
-                        <div className="truncate" title={link.original}>
-                          {link.original}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <code className="text-sm font-mono text-blue-600">{link.short}</code>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCopyUrl(link.short)}
-                            className="h-6 w-6 p-0"
-                          >
-                            <Copy className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <MousePointer className="w-3 h-3 text-gray-400" />
-                          {link.clicks.toLocaleString()}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={link.status === "active" ? "default" : "secondary"}>
-                          {link.status === "active" ? (
-                            <>
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Active
-                            </>
-                          ) : (
-                            "Paused"
-                          )}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">{link.created}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              Visit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <BarChart3 className="mr-2 h-4 w-4" />
-                              Analytics
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Copy className="mr-2 h-4 w-4" />
-                              Copy
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <DataTable columns={columns} data={links} />
             </CardContent>
           </Card>
         </div>
