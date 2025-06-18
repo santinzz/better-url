@@ -1,4 +1,4 @@
-import './envConfig.ts';
+import './envConfig.js';
 import { z } from 'zod/v4';
 
 const envSchema = z.object({
