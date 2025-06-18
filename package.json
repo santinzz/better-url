@@ -6,20 +6,29 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "oxlint --fix"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.9",
+    "@next/env": "^15.3.3",
+    "better-auth": "^1.2.9",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.44.2",
+    "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.3"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "drizzle-kit": "^0.31.1",
+    "oxlint": "^1.1.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.20.3",
+    "typescript": "^5"
   },
   "lint-staged": {
     "**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue,astro,svelte}": "oxlint"
