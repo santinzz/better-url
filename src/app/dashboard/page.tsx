@@ -32,6 +32,7 @@ import { toast } from "sonner"
 import { DataTable } from "@/components/data-table"
 import { getLinks } from "@/actions/getLinks"
 import { columns } from "./columns"
+import { UrlShortener } from "@/components/url-shortener"
 
 export default async function DashboardPage() {
   const links = await getLinks()
@@ -106,21 +107,7 @@ export default async function DashboardPage() {
               <CardDescription>Create a new short URL instantly</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="https://example.com/your-long-url"
-                  className="flex-1"
-                />
-                <Button
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                >
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <>
-                      <Zap className="w-4 h-4 mr-2" />
-                      Shorten
-                    </>
-                </Button>
-              </div>
+              <UrlShortener />
             </CardContent>
           </Card>
 
