@@ -71,13 +71,15 @@ export const verification = sqliteTable('verification', {
 
 export const link = sqliteTable('link', {
 	id: text('id').primaryKey().$defaultFn(crypto.randomUUID),
+	title: text('title'),
 	url: text('url').notNull(),
 	shortUrl: text('short_url').notNull(),
 	clickCount: integer('click_count').notNull().default(0),
 	isActive: integer('is_active', { mode: 'boolean' }).notNull().default(false),
-	createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => /* @__PURE__ */ new Date()),
-	updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => /* @__PURE__ */ new Date()),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
 	userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
+	lastClick: integer('last_click', { mode: 'timestamp' }).$defaultFn(() => /* @__PURE__ */ new Date()),
 }, (table) => [
 	uniqueIndex('short_url_idx').on(table.shortUrl),
 	index('user_id_idx').on(table.userId),

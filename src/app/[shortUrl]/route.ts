@@ -3,64 +3,82 @@ import { db } from '@/lib/db/connection'
 import { link } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { Effect } from 'effect'
+import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod/v4'
 
 const shortUrlSchema = z.object({
-  shortUrl: z.string()
+	shortUrl: z.string(),
 })
 
-export const GET = async (_req: NextRequest, { params }: { params: Promise<{ shortUrl: string }> }) => {
-  const paramsEffect = 
-    Effect.promise(async () => {
-      return await params
-    })
-  paramsEffect.pipe(
-    Effect.flatMap((params) =>
-      Effect.try({
-        try: () => {
-          return shortUrlSchema.parse(params)
-        },
-        catch: (error) => new ParsingError((error as z.ZodError).message)
-      })
-    )
-  )
+export const GET = async (
+	_req: NextRequest,
+	{ params }: { params: Promise<{ shortUrl: string }> }
+) => {
+	const paramsEffect = Effect.promise(async () => {
+		return await params
+	})
+	paramsEffect.pipe(
+		Effect.flatMap((params) =>
+			Effect.try({
+				try: () => {
+					return shortUrlSchema.parse(params)
+				},
+				catch: (error) => new ParsingError((error as z.ZodError).message),
+			})
+		)
+	)
 
-  const effect = paramsEffect.pipe(
-    Effect.flatMap((params) => 
-      Effect.tryPromise({
-        try: async () => {
-          const url = await db
-            .select()
-            .from(link)
-            .where(
-              eq(link.shortUrl, params.shortUrl)
-            )
-            .limit(1)
-          return url
-        },
-        catch: () => new DBError('Error fetching short URL')
-      })
-    ),
-    Effect.flatMap((url) =>
-      Effect.tryPromise({
-        try: async () => {
-          if (url.length === 0) {
-            return new NextResponse(null, { status: 404 })
-          }
+	const effect = paramsEffect.pipe(
+		Effect.flatMap((params) =>
+			Effect.tryPromise({
+				try: async () => {
+					const url = await db
+						.select()
+						.from(link)
+						.where(eq(link.shortUrl, params.shortUrl))
+						.limit(1)
+					return url
+				},
+				catch: () => new DBError('Error fetching short URL'),
+			})
+		),
+		Effect.flatMap((url) =>
+			Effect.tryPromise({
+				try: async () => {
+					return url[0]
+				},
+				catch: () => new ParsingError('Error parsing short URL'),
+			})
+		),
+		Effect.flatMap((url) =>
+			Effect.tryPromise({
+				try: async () => {
+					await db
+						.update(link)
+						.set({
+							clickCount: url.clickCount + 1,
+							lastClick: new Date(),
+						})
+						.where(eq(link.id, url.id))
 
+            return url.url
+				},
+				catch: () => new DBError('Error updating short URL'),
+			})
+		)
+	)
 
-          return NextResponse.redirect(url[0].url)
-        },
-        catch: () => new DBError('Error fetching short URL')
-      })
-    )
-  )
+	const program = Effect.catchTags(effect, {
+		DBError: () => Effect.succeed(new NextResponse(null, { status: 404 })),
+	})
 
-  const program = Effect.catchTags(effect, {
-    DBError: () => 
-      Effect.succeed(new NextResponse(null, { status: 404 }))
+	return Effect.runPromise(program).then((res) => {
+    if (typeof res === 'string') {
+      revalidatePath('/dashboard')
+      return NextResponse.redirect(res)
+    }
+
+    return NextResponse.json({ error: 'unknown error' }, { status: 500 })
   })
-
-  return Effect.runPromise(program).then(res => res)
 }

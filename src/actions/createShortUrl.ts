@@ -9,6 +9,7 @@ import short from 'shortid'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { AuthError, DBError, ParsingError } from '@/errors'
+import { revalidatePath } from 'next/cache'
 
 export const createShortUrl = async ({ url, alias }: FormSchema) => {
 	const getSessionEffect = Effect.promise(async () => {
@@ -51,6 +52,10 @@ export const createShortUrl = async ({ url, alias }: FormSchema) => {
 			},
 			catch: () => new DBError('Error creating short URL')
 		})
+
+		Effect.runSync(
+			Effect.sync(() => revalidatePath('/dashboard/links'))
+		)
 
 		return { data: shortUrl, error: null }
 	})

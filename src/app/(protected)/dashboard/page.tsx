@@ -33,9 +33,14 @@ import { DataTable } from '@/components/data-table'
 import { getLinks } from '@/actions/getLinks'
 import { columns } from './columns'
 import { UrlShortener } from '@/components/url-shortener'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
 export default async function DashboardPage() {
 	const links = await getLinks()
+	const session = await auth.api.getSession({
+		headers: await headers(),
+ })
 
 	const stats = [
 		{
@@ -94,7 +99,7 @@ export default async function DashboardPage() {
 					{/* Welcome Section */}
 					<div className='mb-6'>
 						<h1 className='text-3xl font-bold text-gray-900'>
-							Welcome back, John!
+							Welcome back, {session?.user?.name}!
 						</h1>
 						<p className='text-gray-600 mt-1'>
 							Here's what's happening with your links today.
