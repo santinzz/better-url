@@ -3,50 +3,20 @@
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { Zap } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
-import { FormSchema, formSchema } from '@/lib/schemas/short-url-form'
-import { useTransition } from 'react'
-import { createShortUrl } from '@/actions/createShortUrl'
+import { useShortenUrlForm } from '@/hooks/use-short-url'
+import { cn } from '@/lib/utils'
 
-export const UrlShortener = () => {
-  const [isPending, startTransition] = useTransition()
-	const form = useForm({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			url: '',
-      alias: '',
-		},
-	})
-
-  const handleShortUrl = async (data: FormSchema) => {
-    startTransition(async () => {
-      const shortUrl = await createShortUrl(data)
-
-      if (!shortUrl.data) {
-        toast.error(shortUrl.error)
-      }
-
-      if (shortUrl.data) {
-        toast.success(`Short URL created: ${shortUrl.data.shortUrl}`)
-      }
-
-      form.reset()
-    })
-  }
-
-  useEffect(() => {
-    if (form.formState.errors.url?.message) {
-      toast.error(form.formState.errors.url.message)
-    }
-  }, [form.formState.errors.url?.message])
+export const UrlShortener = ({ vertical }: { vertical?: boolean }) => {
+  const { form, isPending, handleShortUrl } = useShortenUrlForm()
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleShortUrl)} className='flex gap-2 items-center'>
+			<form onSubmit={form.handleSubmit(handleShortUrl)} className={cn(
+        vertical 
+          ? 'flex flex-col gap-4' 
+          : 'flex items-center gap-4',
+      )}>
 				<FormField
 					control={form.control}
 					name='url'

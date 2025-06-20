@@ -22,6 +22,7 @@ const updateAnalyticsEffect = ({ id }: Link) =>
 					lastClick: new Date(),
 					expiresAt: new Date(new Date().getTime() + 60 * 1000),
 					isActive: true,
+					updatedAt: new Date(),
 				})
 				.where(eq(link.id, id))
         .returning()
@@ -49,6 +50,7 @@ const incrementAnalyticsOnlyEffect = (shortUrl: string) =>
 				.set({
 					clickCount: sql`${link.clickCount} + 1`,
 					lastClick: new Date(),
+					updatedAt: new Date(),
 				})
 				.where(eq(link.shortUrl, shortUrl))
 		},
