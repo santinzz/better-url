@@ -1,0 +1,1 @@
+ALTER TABLE `link` ADD `expires_at` integer;

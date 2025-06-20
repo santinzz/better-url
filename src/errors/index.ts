@@ -12,3 +12,8 @@ export class ParsingError {
   readonly _tag = 'ParsingError'
   constructor(readonly reason: string) {}
 }
+
+export class CacheError {
+  readonly _tag = 'CacheError'
+  constructor(readonly reason: string) {}
+}

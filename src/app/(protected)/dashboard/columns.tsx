@@ -1,5 +1,6 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
 import type { Link } from '@/lib/db/schema'
 import { ColumnDef } from '@tanstack/react-table'
 import NextLink from 'next/link'
@@ -33,6 +34,11 @@ export const columns: ColumnDef<Link>[] = [
 	{
 		accessorKey: 'isActive',
 		header: 'Status',
+		cell: ({ row }) => (
+			<Badge variant={row.original.isActive ? 'default' : 'secondary'}>
+				{row.original.isActive ? 'Active' : 'Expired'}
+			</Badge>
+		)
 	},
 	{
 		accessorKey: 'createdAt',

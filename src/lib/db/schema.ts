@@ -80,9 +80,11 @@ export const link = sqliteTable('link', {
 	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => /* @__PURE__ */ new Date()),
 	userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
 	lastClick: integer('last_click', { mode: 'timestamp' }).$defaultFn(() => /* @__PURE__ */ new Date()),
+	expiresAt: integer('expires_at', { mode: 'timestamp' })
 }, (table) => [
 	uniqueIndex('short_url_idx').on(table.shortUrl),
 	index('user_id_idx').on(table.userId),
+	index('expires_at_idx').on(table.expiresAt),
 ])
 
 export const linkSelectSchema = createSelectSchema(link)
