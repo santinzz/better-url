@@ -36,7 +36,7 @@ export const columns: ColumnDef<Link>[] = [
 		header: 'Status',
 		cell: ({ row }) => (
 			<Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-				{row.original.isActive ? 'Active' : 'Expired'}
+				{row.original.isActive ? 'Active' : 'Paused'}
 			</Badge>
 		)
 	},

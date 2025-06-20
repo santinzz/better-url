@@ -20,6 +20,8 @@ const updateAnalyticsEffect = ({ id }: Link) =>
 				.set({
 					clickCount: sql`${link.clickCount} + 1`,
 					lastClick: new Date(),
+					expiresAt: new Date(new Date().getTime() + 60 * 1000),
+					isActive: true,
 				})
 				.where(eq(link.id, id))
         .returning()
@@ -54,9 +56,13 @@ const incrementAnalyticsOnlyEffect = (shortUrl: string) =>
 	})
 
 export const GET = async (
-	_req: NextRequest,
+	req: NextRequest,
 	{ params }: { params: Promise<{ shortUrl: string }> }
 ) => {
+	if (req.url.includes('.')) {
+		return new NextResponse(null, { status: 204 })
+	}
+
 	const paramsEffect = Effect.promise(async () => {
 		return await params
 	})
@@ -107,7 +113,7 @@ export const GET = async (
 		const url = yield* updateAnalyticsEffect(link)
 
 		yield* Effect.promise(async () => {
-		 	await redis.set(`short:${result.shortUrl}`, url, { ex: 60 * 1000 })
+		 	await redis.set(`short:${result.shortUrl}`, url, { ex: 60 })
 		})
 
 		return url
