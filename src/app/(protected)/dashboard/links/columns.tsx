@@ -1,13 +1,26 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import type { Link } from '@/lib/db/schema'
 import { ColumnDef } from '@tanstack/react-table'
 import { formatDistanceToNow } from 'date-fns'
-import { Copy } from 'lucide-react'
+import {
+	BarChart3,
+	Copy,
+	ExternalLink,
+	MoreHorizontal,
+	Trash2,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import NextLink from 'next/link'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import { deleteLink } from '@/actions/delete-link'
 
 export const columns: ColumnDef<Link>[] = [
 	{
@@ -17,7 +30,7 @@ export const columns: ColumnDef<Link>[] = [
 			<div className='space-y-1'>
 				<div className='font-medium'>{row.original.title}</div>
 				<NextLink
-          href={row.original.url}
+					href={row.original.url}
 					className='text-sm truncate max-w-[300px] hover:underline'
 					title={row.original.url}
 				>
@@ -31,10 +44,12 @@ export const columns: ColumnDef<Link>[] = [
 		header: 'Short URL',
 		cell: ({ row }) => {
 			const handleCopyUrl = (url: string) => {
-				navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_VERCEL_URL}/${url}`)
+				navigator.clipboard.writeText(
+					`${process.env.NEXT_PUBLIC_VERCEL_URL}/${url}`
+				)
 				toast('Copied!', {
 					description: 'Short URL copied to clipboard',
-          richColors: true,
+					richColors: true,
 				})
 			}
 
@@ -96,6 +111,39 @@ export const columns: ColumnDef<Link>[] = [
 						  })
 						: 'Never'}
 				</div>
+			)
+		},
+	},
+	{
+		id: 'actions',
+		enableHiding: false,
+		cell: ({ row }) => {
+			return (
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant='ghost' className='size-8 p-0 cursor-pointer'>
+							<MoreHorizontal className='w-4 h-4 text-muted-foreground hover:text-black transition-colors' />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						<DropdownMenuItem>
+							<ExternalLink className='w-4 h-4 mr-2 text-muted-foreground hover:text-black transition-colors' />
+							Visit
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<BarChart3 className='w-4 h-4 mr-2 text-muted-foreground hover:text-black transition-colors' />
+							Analytics
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<Copy className='w-4 h-4 mr-2 text-muted-foreground hover:text-black transition-colors' />
+							Copy
+						</DropdownMenuItem>
+						<DropdownMenuItem className='text-red-600' onClick={() => deleteLink(row.original.id)}>
+							<Trash2 className='w-4 h-4 mr-2 hover:text-black transition-colors text-red-600' />
+							Delete
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			)
 		},
 	},
