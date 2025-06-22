@@ -14,11 +14,12 @@ export const columns: ColumnDef<Link>[] = [
 		accessorKey: 'shortUrl',
 		header: 'Short URL',
 		cell: ({ row }) => {
-			const url = window.location.origin
+			const url = process.env.NEXT_PUBLIC_BASE_URL
 			const href = `${url}/${row.original.shortUrl}`
 
 			return (
 				<NextLink
+					prefetch={false}
 					href={href}
 					className='flex underline items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors duration-200 ease-linear'
 				>
@@ -38,7 +39,7 @@ export const columns: ColumnDef<Link>[] = [
 			<Badge variant={row.original.isActive ? 'default' : 'secondary'}>
 				{row.original.isActive ? 'Active' : 'Paused'}
 			</Badge>
-		)
+		),
 	},
 	{
 		accessorKey: 'createdAt',

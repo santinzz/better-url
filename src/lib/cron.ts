@@ -5,7 +5,6 @@ import { lt } from 'drizzle-orm'
 import { redis } from './db/redis'
 
 cron.schedule('*/1 * * * *', async () => {
-  console.log('Uncaching expired links')
 	const links = await db
 		.update(link)
 		.set({

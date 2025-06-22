@@ -36,18 +36,21 @@ export const createShortUrl = async ({ url, alias }: FormSchema) => {
 
 		const shortUrl = yield* Effect.tryPromise({
 			try: async () => {
+				const alias = parsedForm.alias || short.generate()
 				const [shortUrl] = await db
 					.insert(link)
 					.values({
 						url: parsedForm.url,
-						shortUrl: parsedForm.alias ?? short.generate(),
+						shortUrl: alias,
 						userId: session?.user.id as string,
 					})
 					.returning({
 						shortUrl: link.shortUrl,
 						url: link.url,
 					})
-				
+
+					console.log({ shortUrl })
+
 				return shortUrl
 			},
 			catch: () => new DBError('Error creating short URL')

@@ -45,7 +45,7 @@ export const columns: ColumnDef<Link>[] = [
 		cell: ({ row }) => {
 			const handleCopyUrl = (url: string) => {
 				navigator.clipboard.writeText(
-					`${window.location.origin}/${url}`
+					`${process.env.NEXT_PUBLIC_BASE_URL}/${url}`
 				)
 				toast('Copied!', {
 					description: 'Short URL copied to clipboard',
@@ -56,12 +56,13 @@ export const columns: ColumnDef<Link>[] = [
 			return (
 				<div className='text-sm text-muted-foreground flex items-center gap-2'>
 					<NextLink
-						href={`${window.location.origin}/${row.original.shortUrl}`}
+						prefetch={false}
+						href={`${process.env.NEXT_PUBLIC_BASE_URL}/${row.original.shortUrl}`}
 						target='_blank'
 						rel='noopener noreferrer'
 						className='text-blue-600 hover:underline'
 					>
-						{window.location.origin}/{row.original.shortUrl}
+						{process.env.NEXT_PUBLIC_BASE_URL}/{row.original.shortUrl}
 					</NextLink>
 					<Copy
 						className='w-4 h-4 cursor-pointer hover:text-black transition-colors'

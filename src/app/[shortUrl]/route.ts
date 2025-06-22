@@ -59,10 +59,10 @@ export const GET = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ shortUrl: string }> }
 ) => {
-	if (req.url.includes('.')) {
+	if (req.url.includes('.') || req.url.includes('dashboard')) {
 		return new NextResponse(null, { status: 204 })
 	}
-
+ 
 	const paramsEffect = Effect.promise(async () => {
 		return await params
 	})
