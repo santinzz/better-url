@@ -27,8 +27,6 @@ const updateAnalyticsEffect = ({ id }: Link) =>
 				.where(eq(link.id, id))
         .returning()
 
-      console.log({ data })
-
 			return data[0].url
 		},
 		catch: () => new DBError('Error updating short URL'),

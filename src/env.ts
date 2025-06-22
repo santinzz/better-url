@@ -6,7 +6,6 @@ const envSchema = z.object({
   TURSO_AUTH_TOKEN: z.string(),
   BETTER_AUTH_SECRET: z.string(),
   BETTER_AUTH_URL: z.string(),
-  CF_PAGES_URL: z.string(),
 })
 
 export const env = envSchema.parse(process.env);

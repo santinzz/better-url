@@ -1,7 +1,6 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { env } from '@/env'
 import type { Link } from '@/lib/db/schema'
 import { ColumnDef } from '@tanstack/react-table'
 import NextLink from 'next/link'
@@ -15,7 +14,7 @@ export const columns: ColumnDef<Link>[] = [
 		accessorKey: 'shortUrl',
 		header: 'Short URL',
 		cell: ({ row }) => {
-			const url = env.CF_PAGES_URL
+			const url = window.location.origin
 			const href = `${url}/${row.original.shortUrl}`
 
 			return (

@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { deleteLink } from '@/actions/delete-link'
-import { env } from '@/env'
 
 export const columns: ColumnDef<Link>[] = [
 	{
@@ -46,7 +45,7 @@ export const columns: ColumnDef<Link>[] = [
 		cell: ({ row }) => {
 			const handleCopyUrl = (url: string) => {
 				navigator.clipboard.writeText(
-					`${env.CF_PAGES_URL}/${url}`
+					`${window.location.origin}/${url}`
 				)
 				toast('Copied!', {
 					description: 'Short URL copied to clipboard',
@@ -57,12 +56,12 @@ export const columns: ColumnDef<Link>[] = [
 			return (
 				<div className='text-sm text-muted-foreground flex items-center gap-2'>
 					<NextLink
-						href={`${env.CF_PAGES_URL}/${row.original.shortUrl}`}
+						href={`${window.location.origin}/${row.original.shortUrl}`}
 						target='_blank'
 						rel='noopener noreferrer'
 						className='text-blue-600 hover:underline'
 					>
-						{env.CF_PAGES_URL}/{row.original.shortUrl}
+						{window.location.origin}/{row.original.shortUrl}
 					</NextLink>
 					<Copy
 						className='w-4 h-4 cursor-pointer hover:text-black transition-colors'
