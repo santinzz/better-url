@@ -17,7 +17,7 @@ import { Effect } from 'effect'
 import { Skeleton } from './ui/skeleton'
 
 export const UserButton = () => {
-	const session = authClient.useSession()
+	const session = authClient.useSession() 
 	const router = useRouter()
 
 	if (session.isPending) {
@@ -37,7 +37,7 @@ export const UserButton = () => {
 	}
 
 	if (!session.data) {
-		throw new Error('User session not found')
+		return null
 	}
 
 	const handleSignOut = async () => {
