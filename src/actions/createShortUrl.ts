@@ -10,6 +10,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { AuthError, DBError, ParsingError } from '@/errors'
 import { revalidatePath } from 'next/cache'
+import { eq } from 'drizzle-orm'
 
 export const createShortUrl = async ({ url, alias }: FormSchema) => {
 	const getSessionEffect = Effect.promise(async () => {
@@ -34,9 +35,23 @@ export const createShortUrl = async ({ url, alias }: FormSchema) => {
 
 		const parsedForm = yield* parsedUrlEffect
 
+		const alias = yield* Effect.succeed(parsedForm.alias || short.generate())
+
+		const isExistingUrl = yield* Effect.tryPromise({
+			try: async () => {
+				const existingUrl = await db.select().from(link).where(eq(link.shortUrl, alias))
+
+				return existingUrl.length > 0
+			},
+			catch: () => new DBError('Alias already exists')
+		})
+
+		if (isExistingUrl) {
+			yield* Effect.fail<DBError>(new DBError('Alias already exists'))
+		}
+
 		const shortUrl = yield* Effect.tryPromise({
 			try: async () => {
-				const alias = parsedForm.alias || short.generate()
 				const [shortUrl] = await db
 					.insert(link)
 					.values({

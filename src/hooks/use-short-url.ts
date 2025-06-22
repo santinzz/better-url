@@ -22,12 +22,14 @@ export function useShortenUrlForm() {
       const shortUrl = await createShortUrl(data)
 
       if (!shortUrl.data) {
-        toast.error(shortUrl.error)
+        toast.error(shortUrl.error, {
+          richColors: true,
+        })
       } else {
         toast.success(`Short URL created: ${shortUrl.data.shortUrl}`)
+        form.reset()
       }
 
-      form.reset()
     })
   }
 

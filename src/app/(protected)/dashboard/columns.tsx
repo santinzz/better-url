@@ -14,7 +14,7 @@ export const columns: ColumnDef<Link>[] = [
 		accessorKey: 'shortUrl',
 		header: 'Short URL',
 		cell: ({ row }) => {
-			const url = process.env.NEXT_PUBLIC_BASE_URL
+			const url = process.env.NEXT_PUBLIC_VERCEL_URL
 			const href = `${url}/${row.original.shortUrl}`
 
 			return (
