@@ -119,6 +119,24 @@ export const columns: ColumnDef<Link>[] = [
 		id: 'actions',
 		enableHiding: false,
 		cell: ({ row }) => {
+			const handleRedirect = (url: string) => {
+				window.open(
+					`${process.env.NEXT_PUBLIC_VERCEL_URL}/${url}`,
+					'_blank',
+					'noopener,noreferrer'
+				)
+			}
+
+			const handleCopyUrl = (url: string) => {
+				navigator.clipboard.writeText(
+					`${process.env.NEXT_PUBLIC_VERCEL_URL}/${url}`
+				)
+				toast('Copied!', {
+					description: 'Short URL copied to clipboard',
+					richColors: true,
+				})
+			}
+
 			return (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -127,7 +145,7 @@ export const columns: ColumnDef<Link>[] = [
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={() => handleRedirect(row.original.shortUrl)}>
 							<ExternalLink className='w-4 h-4 mr-2 text-muted-foreground hover:text-black transition-colors' />
 							Visit
 						</DropdownMenuItem>
@@ -135,7 +153,7 @@ export const columns: ColumnDef<Link>[] = [
 							<BarChart3 className='w-4 h-4 mr-2 text-muted-foreground hover:text-black transition-colors' />
 							Analytics
 						</DropdownMenuItem>
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={() => handleCopyUrl(row.original.shortUrl)}>
 							<Copy className='w-4 h-4 mr-2 text-muted-foreground hover:text-black transition-colors' />
 							Copy
 						</DropdownMenuItem>

@@ -30,17 +30,43 @@ import {
 	MousePointer,
 } from 'lucide-react'
 import { DataTable } from '@/components/data-table'
-import { getLinks } from '@/actions/getLinks'
 import { columns } from './columns'
 import { UrlShortener } from '@/components/url-shortener'
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { Data, Effect } from 'effect'
+import { DB, DbServiceLayer } from '@/lib/dbService'
+import { SessionService, SessionServiceLayer } from '@/lib/sessionService'
+
+class UnauthorizedError extends Data.TaggedError('UnauthorizedError')<{
+	message: string
+	cause?: unknown
+}> {}
+
+const loadEffect = Effect.gen(function* () {
+	const sessionService = yield* SessionService
+	const session = yield* sessionService.getSession
+
+	if (!session) {
+		return yield* Effect.fail(new UnauthorizedError({ message: 'Unauthorized' }))
+	}
+
+	yield* Effect.logInfo('Loading user links for', session.user.id)
+
+	const links = yield* DB.query.getUserLinks(session.user.id)
+
+	return {
+		links,
+		session,
+	}
+})
 
 export default async function DashboardPage() {
-	const links = await getLinks()
-	const session = await auth.api.getSession({
-		headers: await headers(),
- })
+	const runnable = loadEffect.pipe(
+		Effect.provide(DbServiceLayer),
+		Effect.provide(SessionServiceLayer),
+	)
+	const { links, session } = await Effect.runPromise(runnable)
 
 	const stats = [
 		{
