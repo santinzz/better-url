@@ -32,8 +32,8 @@ export const createShortUrl = async ({ url, alias }: FormSchema) => {
 
 	const runnable = Effect.catchTags(effect, {
 		AuthError: (authError) => Effect.succeed({ data: null, error: authError.message }),
-		DatabaseError: (dbError) => Effect.succeed({ data: null, error: dbError.message }),
 		ParsingError: (parsingError) => Effect.succeed({ data: null, error: parsingError.message }),
+		DatabaseError: () => Effect.succeed({ data: null, error: 'Alias already exists' }),
 	})
 
 	const program = runnable.pipe(

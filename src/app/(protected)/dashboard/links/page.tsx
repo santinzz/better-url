@@ -27,11 +27,11 @@ import {
 } from "lucide-react"
 import { DataTable } from "@/components/data-table"
 import { columns } from "./columns"
-import { getLinks } from "@/actions/getLinks"
 import { UrlShortener } from "@/components/url-shortener"
+import { getLinksWithSession } from "@/actions/getLinksWithSession"
 
 export default async function LinksPage() {
-  const links = await getLinks()
+  const { links } = await getLinksWithSession()
 
   return (
     <SidebarProvider>
