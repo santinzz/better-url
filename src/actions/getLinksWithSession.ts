@@ -1,6 +1,6 @@
-import { Data, Effect } from "effect"
-import { DB, DbServiceLayer } from "@/lib/dbService"
-import { SessionService, SessionServiceLayer } from "@/lib/sessionService"
+import { Data, Effect } from 'effect'
+import { DB, DbServiceLayer } from '@/lib/dbService'
+import { SessionService, SessionServiceLayer } from '@/lib/sessionService'
 
 class UnauthorizedError extends Data.TaggedError('UnauthorizedError')<{
   message: string
@@ -12,7 +12,9 @@ const loadEffect = Effect.gen(function* () {
   const session = yield* sessionService.getSession
 
   if (!session) {
-    return yield* Effect.fail(new UnauthorizedError({ message: 'Unauthorized' }))
+    return yield* Effect.fail(
+      new UnauthorizedError({ message: 'Unauthorized' })
+    )
   }
 
   yield* Effect.logInfo('Loading user links for', session.user.id)
@@ -26,8 +28,8 @@ const loadEffect = Effect.gen(function* () {
 })
 
 const runnable = loadEffect.pipe(
-    Effect.provide(DbServiceLayer),
-    Effect.provide(SessionServiceLayer),
+  Effect.provide(DbServiceLayer),
+  Effect.provide(SessionServiceLayer)
 )
 
 export const getLinksWithSession = () => Effect.runPromise(runnable)

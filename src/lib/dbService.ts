@@ -97,6 +97,34 @@ export const DB = {
 
         return link
       }),
+    getBasicStats: (userId: string) =>
+      Effect.gen(function * () {
+        const dbService = yield* DbService
+        const db = yield* dbService.getDbConnection
+
+        const [result] = yield* Effect.tryPromise({
+          try: () => db
+            .select({
+              totalLinks: sql<number>`COUNT(${schema.link.shortUrl})`,
+              totalClicks: sql<number>`SUM(${schema.link.clickCount})`,
+              activeLinks: sql<number>`COUNT(CASE WHEN ${schema.link.isActive} THEN 1 END)`,
+            })
+            .from(schema.link)
+            .where(
+              eq(schema.link.userId, userId)
+            ),
+          catch: (error) => 
+            new DatabaseError({
+              cause: error,
+              message: 'Failed to query database',
+            }),
+        })
+
+        return {
+          ...result,
+          clickRate: result.totalClicks ? (result.totalClicks / result.totalLinks) * 100 : 0,
+        }
+      })
   },
   mutate: {
     createShortUrl: ({
